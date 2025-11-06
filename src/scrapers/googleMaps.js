@@ -1,5 +1,5 @@
 import { Actor } from 'apify';
-import { PuppeteerCrawler } from 'crawlee';
+import { PuppeteerCrawler, CheerioCrawler } from 'crawlee';
 
 /**
  * Scrape Google Maps for business listings
@@ -332,23 +332,7 @@ export const scrapeGoogleMaps = async ({
                     }
                 }
 
-                console.log(`✅ Collected ${leads.length} business cards, now enqueuing detail pages...`);
-
-                // Instead of navigating on the same page, enqueue each detail URL as a separate request
-                // This uses fresh browser instances and avoids crashes
-                for (const lead of leads) {
-                    await crawler.addRequests([{
-                        url: lead.googleMapsUrl,
-                        label: 'DETAIL',
-                        userData: {
-                            businessName: lead.businessName,
-                            rating: lead.rating,
-                            reviewCount: lead.reviewCount,
-                        },
-                    }]);
-                }
-
-                console.log(`📤 Enqueued ${leads.length} detail page requests`);
+                console.log(`✅ Collected ${leads.length} business cards`);
 
                 } catch (error) {
                     console.error('❌ Error during search scraping', {
@@ -356,116 +340,6 @@ export const scrapeGoogleMaps = async ({
                         url: request.url,
                     });
                     throw error;
-                }
-
-            } else if (request.label === 'DETAIL') {
-                // Handle detail page extraction in fresh browser instance
-                console.log(`🔍 Fetching details for: ${request.userData.businessName}`);
-
-                try {
-                    // Wait for page to load
-                    await page.waitForTimeout(2000);
-
-                    // Extract detailed information
-                    const details = await page.evaluate(() => {
-                        const getElementText = (selector) => {
-                            const el = document.querySelector(selector);
-                            return el?.textContent?.trim() || null;
-                        };
-
-                        const getButtonAriaLabel = (text) => {
-                            const button = Array.from(document.querySelectorAll('button')).find((btn) =>
-                                btn.getAttribute('aria-label')?.includes(text)
-                            );
-                            return button?.getAttribute('aria-label') || null;
-                        };
-
-                        // Extract phone number
-                        const phoneLabel = getButtonAriaLabel('Phone:');
-                        const phone = phoneLabel?.match(/[\d\s\(\)\-\+]+/)?.[0]?.trim() || null;
-
-                        // Extract website
-                        const websiteLink = document.querySelector('a[data-item-id="authority"]');
-                        const website = websiteLink?.href || null;
-
-                        // Extract address
-                        const addressButton = Array.from(document.querySelectorAll('button')).find((btn) =>
-                            btn.getAttribute('data-item-id')?.includes('address')
-                        );
-                        const address = addressButton?.getAttribute('aria-label')?.replace('Address: ', '') || null;
-
-                        // Extract category
-                        const categoryButton = document.querySelector('button[jsaction*="category"]');
-                        const category = categoryButton?.textContent?.trim() || null;
-
-                        // Check if listing is claimed
-                        const claimed = document.querySelector('[aria-label*="Claimed"]') !== null;
-
-                        // Extract description
-                        const description = getElementText('[class*="description"]');
-
-                        // Extract hours (if available)
-                        const hoursButton = Array.from(document.querySelectorAll('button')).find((btn) =>
-                            btn.getAttribute('aria-label')?.includes('Hours')
-                        );
-                        const hours = hoursButton?.getAttribute('aria-label') || null;
-
-                        // Check for social media links
-                        const socialLinks = {
-                            linkedin: document.querySelector('a[href*="linkedin.com"]')?.href || null,
-                            facebook: document.querySelector('a[href*="facebook.com"]')?.href || null,
-                            twitter: document.querySelector('a[href*="twitter.com"]')?.href || null,
-                            instagram: document.querySelector('a[href*="instagram.com"]')?.href || null,
-                        };
-
-                        return {
-                            phone,
-                            website,
-                            address,
-                            category,
-                            claimed,
-                            description,
-                            hours,
-                            socialLinks,
-                        };
-                    });
-
-                    // Create complete lead object
-                    const lead = {
-                        businessName: request.userData.businessName,
-                        googleMapsUrl: request.url,
-                        rating: request.userData.rating,
-                        reviewCount: request.userData.reviewCount,
-                        ...details,
-                    };
-
-                    // Apply additional filters
-                    let shouldInclude = true;
-
-                    if (filters.hasWebsite && !lead.website) {
-                        shouldInclude = false;
-                    }
-
-                    if (filters.claimedListing && !lead.claimed) {
-                        shouldInclude = false;
-                    }
-
-                    if (filters.hasSocialMedia) {
-                        const hasSocial = Object.values(lead.socialLinks).some((link) => link !== null);
-                        if (!hasSocial) shouldInclude = false;
-                    }
-
-                    // Save lead if it passes filters
-                    if (shouldInclude) {
-                        leads.push(lead);
-                        console.log(`✅ Added lead: ${lead.businessName} (${lead.website || 'no website'})`);
-                    } else {
-                        console.log(`🚫 Filtered out: ${lead.businessName}`);
-                    }
-
-                } catch (detailError) {
-                    console.warn(`⚠️ Failed to get details for ${request.userData.businessName}: ${detailError.message}`);
-                    // Lead won't be added to dataset, but crawl continues
                 }
             }
         },
@@ -477,13 +351,124 @@ export const scrapeGoogleMaps = async ({
         },
     });
 
-    // Run the crawler
+    // Run the Puppeteer crawler to get listing cards
     await crawler.run([searchUrl]);
 
-    // Filter out leads marked for removal
-    const filteredLeads = leads.filter((lead) => !lead._remove);
+    console.log(`📋 Collected ${leads.length} business cards, now fetching details with HTTP requests...`);
 
-    console.log(`✅ Successfully scraped ${filteredLeads.length} businesses from Google Maps`);
+    // Now use CheerioCrawler (HTTP only, no browser) to fetch detail pages
+    const detailedLeads = [];
 
-    return filteredLeads;
+    const cheerioCrawler = new CheerioCrawler({
+        maxConcurrency: maxConcurrency * 2, // Can handle more since no browsers
+        maxRequestRetries: 2,
+        requestHandlerTimeoutSecs: 30,
+
+        async requestHandler({ $, request }) {
+            const leadData = request.userData;
+            console.log(`🔍 Fetching details: ${leadData.businessName}`);
+
+            try {
+                // Extract phone number
+                const phoneButtons = $('button[aria-label*="Phone"]');
+                let phone = null;
+                phoneButtons.each((_, el) => {
+                    const ariaLabel = $(el).attr('aria-label');
+                    if (ariaLabel) {
+                        const match = ariaLabel.match(/[\d\s\(\)\-\+]+/);
+                        if (match) phone = match[0].trim();
+                    }
+                });
+
+                // Extract website
+                const websiteLink = $('a[data-item-id="authority"]');
+                const website = websiteLink.attr('href') || null;
+
+                // Extract address
+                const addressButtons = $('button[data-item-id*="address"]');
+                let address = null;
+                addressButtons.each((_, el) => {
+                    const ariaLabel = $(el).attr('aria-label');
+                    if (ariaLabel) {
+                        address = ariaLabel.replace('Address: ', '').trim();
+                    }
+                });
+
+                // Extract category
+                const categoryButton = $('button[jsaction*="category"]').first();
+                const category = categoryButton.text().trim() || null;
+
+                // Check if listing is claimed
+                const claimed = $('[aria-label*="Claimed"]').length > 0;
+
+                // Extract social media links
+                const socialLinks = {
+                    linkedin: $('a[href*="linkedin.com"]').attr('href') || null,
+                    facebook: $('a[href*="facebook.com"]').attr('href') || null,
+                    twitter: $('a[href*="twitter.com"]').attr('href') || null,
+                    instagram: $('a[href*="instagram.com"]').attr('href') || null,
+                };
+
+                // Create complete lead object
+                const lead = {
+                    businessName: leadData.businessName,
+                    googleMapsUrl: request.url,
+                    rating: leadData.rating,
+                    reviewCount: leadData.reviewCount,
+                    phone,
+                    website,
+                    address,
+                    category,
+                    claimed,
+                    socialLinks,
+                };
+
+                // Apply additional filters
+                let shouldInclude = true;
+
+                if (filters.hasWebsite && !lead.website) {
+                    shouldInclude = false;
+                }
+
+                if (filters.claimedListing && !lead.claimed) {
+                    shouldInclude = false;
+                }
+
+                if (filters.hasSocialMedia) {
+                    const hasSocial = Object.values(lead.socialLinks).some((link) => link !== null);
+                    if (!hasSocial) shouldInclude = false;
+                }
+
+                if (shouldInclude) {
+                    detailedLeads.push(lead);
+                    console.log(`✅ Added: ${lead.businessName} (${lead.website || 'no website'})`);
+                } else {
+                    console.log(`🚫 Filtered: ${lead.businessName}`);
+                }
+
+            } catch (error) {
+                console.warn(`⚠️ Failed to extract details for ${leadData.businessName}: ${error.message}`);
+            }
+        },
+
+        failedRequestHandler({ request, error }) {
+            console.warn(`⚠️ HTTP request failed for ${request.userData.businessName}: ${error.message}`);
+        },
+    });
+
+    // Enqueue detail page URLs for Cheerio crawler
+    const detailRequests = leads.map((lead) => ({
+        url: lead.googleMapsUrl,
+        userData: {
+            businessName: lead.businessName,
+            rating: lead.rating,
+            reviewCount: lead.reviewCount,
+        },
+    }));
+
+    await cheerioCrawler.run(detailRequests);
+
+    console.log(`✅ Successfully scraped ${detailedLeads.length} businesses with full details`);
+
+    return detailedLeads;
 };
