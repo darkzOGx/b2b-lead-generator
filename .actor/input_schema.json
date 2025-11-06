@@ -47,6 +47,12 @@
         "hasWebsite": true,
         "claimedListing": true
       },
+      "prefill": {
+        "minRating": 4.0,
+        "minReviews": 10,
+        "hasWebsite": true,
+        "claimedListing": true
+      },
       "properties": {
         "minRating": {
           "title": "Minimum Rating",
