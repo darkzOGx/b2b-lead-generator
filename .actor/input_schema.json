@@ -12,6 +12,19 @@
       "enumTitles": ["⚡ Basic (Fast) - 10x faster, basic data only", "🎯 Enriched (Slow) - Full contact info + AI scoring"],
       "default": "enriched"
     },
+    "performancePreset": {
+      "title": "Performance Preset",
+      "type": "string",
+      "description": "Choose based on your Apify plan's available memory. Higher presets = faster scraping but require more RAM. Turbo mode requires 32GB+ RAM.",
+      "editor": "select",
+      "enum": ["balanced", "fast", "turbo"],
+      "enumTitles": [
+        "⚖️ Balanced (8GB RAM) - 5 concurrent browsers, safe for all plans",
+        "🚀 Fast (16GB RAM) - 10 concurrent browsers, 2x faster",
+        "⚡ Turbo (32GB RAM) - 20 concurrent browsers, 4x faster"
+      ],
+      "default": "balanced"
+    },
     "searchQuery": {
       "title": "Search term(s)",
       "type": "string",

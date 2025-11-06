@@ -19,6 +19,7 @@ export const scrapeGoogleMaps = async ({
     filters = {},
     proxyConfig,
     maxConcurrency = 5,
+    detailConcurrency = null, // Separate concurrency for detail page crawling (null = use default based on proxies)
     fastMode = false, // Skip detail pages for 10x speed
     language = 'en', // Language code
     skipClosedPlaces = true, // Filter out permanently closed places
@@ -442,11 +443,23 @@ export const scrapeGoogleMaps = async ({
     // Use LOWER concurrency (2-3 browsers) to prevent CPU overload
     const detailedLeads = [];
 
-    // Adjust settings based on proxy usage
+    // Adjust settings based on proxy usage and performance preset
     const usingProxies = proxyConfiguration !== undefined;
-    const detailSettings = usingProxies
-        ? { concurrency: 2, navTimeout: 60, handlerTimeout: 90, retries: 2 } // Increased timeouts to handle slow-loading pages
-        : { concurrency: 1, navTimeout: 60, handlerTimeout: 90, retries: 3 }; // No proxies = slower, more retries
+
+    // Determine detail concurrency: use custom value if provided, otherwise use defaults
+    let detailConcurrencyValue;
+    if (detailConcurrency !== null) {
+        detailConcurrencyValue = detailConcurrency; // User-specified concurrency (from performance preset)
+    } else {
+        detailConcurrencyValue = usingProxies ? 3 : 1; // Default: 3 with proxies, 1 without
+    }
+
+    const detailSettings = {
+        concurrency: detailConcurrencyValue,
+        navTimeout: 60,
+        handlerTimeout: 90,
+        retries: usingProxies ? 2 : 3
+    };
 
     console.log(`⚙️ Detail crawler settings: ${usingProxies ? 'WITH' : 'WITHOUT'} proxies (concurrency: ${detailSettings.concurrency}, timeout: ${detailSettings.navTimeout}s)`);
 

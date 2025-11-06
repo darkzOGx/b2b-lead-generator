@@ -18,6 +18,15 @@ try {
     const isBasicMode = scrapingMode === 'basic';
     const isEnrichedMode = scrapingMode === 'enriched';
 
+    // Determine performance preset (concurrency settings)
+    const performancePreset = rawInput.performancePreset || 'balanced';
+    const performanceConfig = {
+        balanced: { maxConcurrency: 5, detailConcurrency: 3, memoryMB: 8192 },
+        fast: { maxConcurrency: 10, detailConcurrency: 8, memoryMB: 16384 },
+        turbo: { maxConcurrency: 20, detailConcurrency: 15, memoryMB: 32768 },
+    };
+    const perfSettings = performanceConfig[performancePreset] || performanceConfig.balanced;
+
     // Transform new flat structure to internal format
     const input = {
         searchQueries: [
@@ -74,11 +83,13 @@ try {
             useApifyProxy: true,
             apifyProxyGroups: []
         },
-        maxConcurrency: rawInput.maxConcurrency || 5,
+        maxConcurrency: rawInput.maxConcurrency || perfSettings.maxConcurrency,
+        detailConcurrency: perfSettings.detailConcurrency, // Separate concurrency for detail page fetching
     };
 
     console.log('🚀 Starting B2B Lead Generation Actor');
     console.log('Mode:', isBasicMode ? '⚡ BASIC (Fast)' : '🎯 ENRICHED (Slow)');
+    console.log('Performance:', `${performancePreset.toUpperCase()} (${perfSettings.maxConcurrency} concurrent browsers)`);
     console.log('Query:', input.searchQueries[0].category, 'in', input.searchQueries[0].location);
     console.log('Max results:', input.searchQueries[0].maxResults);
     console.log('Email extraction:', input.enrichment.extractEmails);
@@ -196,7 +207,8 @@ try {
             filters: input.filters || {},
             proxyConfig: input.proxy,
             maxConcurrency: input.maxConcurrency || 5,
-            fastMode: false, // Always full mode for email extraction
+            detailConcurrency: input.detailConcurrency, // Separate concurrency for detail pages
+            fastMode: input.fastMode, // Use scraping mode setting
             language: input.language || 'en',
             skipClosedPlaces: input.skipClosedPlaces !== false,
             enrichment: input.enrichment || {},
