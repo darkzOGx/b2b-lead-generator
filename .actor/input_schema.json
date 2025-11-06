@@ -8,11 +8,18 @@
       "type": "array",
       "description": "List of category + location combinations to scrape from Google Maps",
       "editor": "json",
+      "default": [
+        {
+          "category": "software companies",
+          "location": "San Francisco, CA",
+          "maxResults": 10
+        }
+      ],
       "prefill": [
         {
           "category": "software companies",
           "location": "San Francisco, CA",
-          "maxResults": 100
+          "maxResults": 10
         }
       ],
       "example": [
@@ -85,9 +92,14 @@
       "default": {
         "extractEmails": true,
         "validateContacts": false,
-        "companyData": false,
-        "techStack": false,
-        "findDecisionMakers": false
+        "findDecisionMakers": false,
+        "enrichFirmographics": false
+      },
+      "prefill": {
+        "extractEmails": true,
+        "validateContacts": false,
+        "findDecisionMakers": false,
+        "enrichFirmographics": false
       },
       "properties": {
         "extractEmails": {
@@ -129,7 +141,20 @@
       "description": "Calculate lead quality scores (A+ to F) based on your ideal customer profile",
       "editor": "json",
       "default": {
-        "enableScoring": true
+        "enableScoring": true,
+        "idealCustomerProfile": {
+          "industries": ["Software", "Technology", "SaaS"],
+          "locations": ["San Francisco", "California"],
+          "minEmployees": 10
+        }
+      },
+      "prefill": {
+        "enableScoring": true,
+        "idealCustomerProfile": {
+          "industries": ["Software", "Technology", "SaaS"],
+          "locations": ["San Francisco", "California"],
+          "minEmployees": 10
+        }
       },
       "properties": {
         "enableScoring": {
@@ -168,7 +193,14 @@
       "description": "Configure how results are delivered",
       "editor": "json",
       "default": {
-        "format": "csv"
+        "format": "json",
+        "deduplicate": true,
+        "webhookUrl": null
+      },
+      "prefill": {
+        "format": "json",
+        "deduplicate": true,
+        "webhookUrl": null
       },
       "properties": {
         "format": {
