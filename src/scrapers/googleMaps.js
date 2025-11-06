@@ -140,14 +140,56 @@ export const scrapeGoogleMaps = async ({
                                     name = link.getAttribute('aria-label');
                                 }
 
-                                // Extract rating (try multiple methods)
+                                // Extract rating with multiple fallback strategies
                                 let rating = null;
-                                const ratingEl = container.querySelector('[role="img"][aria-label*="star"]') ||
-                                               container.querySelector('span[aria-label*="stars"]');
+                                let ratingStrategy = null;
+
+                                // Strategy 1: aria-label with "star"
+                                let ratingEl = container.querySelector('[role="img"][aria-label*="star"]') ||
+                                              container.querySelector('span[aria-label*="stars"]') ||
+                                              container.querySelector('[aria-label*="star"]');
+
                                 if (ratingEl) {
                                     const ratingText = ratingEl.getAttribute('aria-label') || '';
                                     const match = ratingText.match(/(\d+\.?\d*)\s*star/i);
-                                    if (match) rating = parseFloat(match[1]);
+                                    if (match) {
+                                        rating = parseFloat(match[1]);
+                                        ratingStrategy = 'aria-label-star';
+                                    }
+                                }
+
+                                // Strategy 2: Look for decimal number pattern (e.g., "4.7" or "3.3")
+                                if (rating === null) {
+                                    const allText = container.textContent || '';
+                                    // Match rating-like numbers (1.0-5.0 range)
+                                    const ratingMatch = allText.match(/\b([1-5]\.\d)\b/);
+                                    if (ratingMatch) {
+                                        rating = parseFloat(ratingMatch[1]);
+                                        ratingStrategy = 'text-decimal';
+                                    }
+                                }
+
+                                // Strategy 3: Look in spans for rating numbers
+                                if (rating === null) {
+                                    const spans = container.querySelectorAll('span');
+                                    for (const span of spans) {
+                                        const text = span.textContent?.trim() || '';
+                                        // Match X.X format where X is 1-5
+                                        if (/^[1-5]\.\d$/.test(text)) {
+                                            rating = parseFloat(text);
+                                            ratingStrategy = 'span-rating';
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Track which strategies work
+                                if (ratingStrategy) {
+                                    debug.ratingExtractionStats = debug.ratingExtractionStats || {};
+                                    debug.ratingExtractionStats[ratingStrategy] = (debug.ratingExtractionStats[ratingStrategy] || 0) + 1;
+                                } else {
+                                    debug.ratingExtractionStats = debug.ratingExtractionStats || {};
+                                    debug.ratingExtractionStats['failed'] = (debug.ratingExtractionStats['failed'] || 0) + 1;
                                 }
 
                                 // Extract review count with multiple fallback strategies
