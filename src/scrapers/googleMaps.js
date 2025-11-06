@@ -74,43 +74,97 @@ export const scrapeGoogleMaps = async ({
                     // Wait for new content to load
                     await page.waitForTimeout(2000);
 
-                    // Extract visible business cards
+                    // Extract visible business cards with updated selectors
                     const newBusinessCards = await page.evaluate(() => {
                         const cards = [];
-                        const elements = document.querySelectorAll('a[href*="/maps/place/"]');
 
-                        elements.forEach((element) => {
+                        // Find all business listing containers in the feed
+                        const feed = document.querySelector('[role="feed"]');
+                        if (!feed) return cards;
+
+                        // Try multiple selector strategies for business cards
+                        const listItems = feed.querySelectorAll('div[role="article"], div.Nv2PK, a[href*="/maps/place/"]');
+
+                        console.log(`Found ${listItems.length} potential business elements`);
+
+                        const processedUrls = new Set();
+
+                        listItems.forEach((item) => {
                             try {
-                                const href = element.getAttribute('href');
-                                if (href && href.includes('/maps/place/')) {
-                                    // Extract basic info from the card
-                                    const parent = element.closest('[role="article"]');
-                                    if (!parent) return;
+                                // Find the place link
+                                let link = item.querySelector('a[href*="/maps/place/"]') ||
+                                          (item.tagName === 'A' && item.href?.includes('/maps/place/') ? item : null);
 
-                                    const nameElement = parent.querySelector('[class*="fontHeadline"]');
-                                    const ratingElement = parent.querySelector('[role="img"][aria-label*="star"]');
-                                    const reviewElement = parent.querySelector('span[aria-label*="review"]');
+                                if (!link) return;
 
-                                    const name = nameElement?.textContent?.trim();
-                                    const ratingText = ratingElement?.getAttribute('aria-label') || '';
-                                    const rating = parseFloat(ratingText.match(/[\d.]+/)?.[0]);
-                                    const reviewText = reviewElement?.getAttribute('aria-label') || '';
-                                    const reviewCount = parseInt(reviewText.match(/\d+/)?.[0]) || 0;
+                                const href = link.href;
+                                if (!href || processedUrls.has(href)) return;
+                                processedUrls.add(href);
 
-                                    if (name && href) {
-                                        cards.push({
-                                            businessName: name,
-                                            googleMapsUrl: href,
-                                            rating: rating || null,
-                                            reviewCount: reviewCount || 0,
-                                        });
+                                // Find the parent container (article or closest div)
+                                const container = item.closest('[role="article"]') ||
+                                                 item.closest('div.Nv2PK') ||
+                                                 link.closest('div[jsaction]') ||
+                                                 item;
+
+                                if (!container) return;
+
+                                // Extract business name (try multiple selectors)
+                                let name = null;
+                                const nameSelectors = [
+                                    '[class*="fontHeadline"]',
+                                    '[class*="fontBodyMedium"]',
+                                    'div[role="heading"]',
+                                    '.fontDisplayLarge',
+                                    'a[href*="/maps/place/"] div'
+                                ];
+
+                                for (const selector of nameSelectors) {
+                                    const nameEl = container.querySelector(selector);
+                                    if (nameEl?.textContent?.trim()) {
+                                        name = nameEl.textContent.trim();
+                                        break;
                                     }
                                 }
+
+                                // If still no name, try the link's aria-label
+                                if (!name && link.getAttribute('aria-label')) {
+                                    name = link.getAttribute('aria-label');
+                                }
+
+                                // Extract rating (try multiple methods)
+                                let rating = null;
+                                const ratingEl = container.querySelector('[role="img"][aria-label*="star"]') ||
+                                               container.querySelector('span[aria-label*="stars"]');
+                                if (ratingEl) {
+                                    const ratingText = ratingEl.getAttribute('aria-label') || '';
+                                    const match = ratingText.match(/(\d+\.?\d*)\s*star/i);
+                                    if (match) rating = parseFloat(match[1]);
+                                }
+
+                                // Extract review count
+                                let reviewCount = 0;
+                                const reviewEl = container.querySelector('span[aria-label*="review"]');
+                                if (reviewEl) {
+                                    const reviewText = reviewEl.getAttribute('aria-label') || '';
+                                    const match = reviewText.match(/(\d+)/);
+                                    if (match) reviewCount = parseInt(match[1]);
+                                }
+
+                                if (name && href) {
+                                    cards.push({
+                                        businessName: name,
+                                        googleMapsUrl: href,
+                                        rating: rating,
+                                        reviewCount: reviewCount,
+                                    });
+                                }
                             } catch (err) {
-                                // Skip invalid cards
+                                console.error('Error extracting card:', err.message);
                             }
                         });
 
+                        console.log(`Extracted ${cards.length} business cards`);
                         return cards;
                     });
 
