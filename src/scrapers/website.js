@@ -39,6 +39,8 @@ export const extractEmailFromWebsite = async (websiteUrl) => {
         maxConcurrency: 1,
         maxRequestRetries: 2,
         requestHandlerTimeoutSecs: 30,
+        // Force unique request queue for each crawler instance
+        requestQueue: await Actor.openRequestQueue(),
 
         async requestHandler({ $, request, enqueueLinks }) {
             // Skip if we already found an email
