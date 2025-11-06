@@ -411,7 +411,7 @@ export const scrapeGoogleMaps = async ({
         proxyConfiguration,
         maxConcurrency: 2, // VERY LOW to prevent CPU overload
         maxRequestRetries: 2,
-        requestHandlerTimeoutSecs: 60,
+        requestHandlerTimeoutSecs: 30, // Reduced from 60 for faster processing
 
         launchContext: {
             launchOptions: {
@@ -444,8 +444,11 @@ export const scrapeGoogleMaps = async ({
             console.log(`🔍 Fetching details: ${leadData.businessName}`);
 
             try {
-                // Wait for page to load
-                await page.waitForNetworkIdle({ timeout: 10000 }).catch(() => {});
+                // Wait for page to load (shorter timeout for speed)
+                await page.waitForNetworkIdle({ timeout: 5000 }).catch(() => {});
+
+                // Wait for main info panel to appear
+                await page.waitForSelector('[role="main"]', { timeout: 8000 }).catch(() => {});
 
                 // Extract phone number
                 let phone = null;
@@ -486,8 +489,15 @@ export const scrapeGoogleMaps = async ({
                     }
                 } catch (e) {}
 
-                // Check if listing is claimed
-                const claimed = (await page.$('[aria-label*="Claimed"]')) !== null;
+                // Check if listing is claimed (business owner verified)
+                // Most legitimate businesses ARE claimed but don't show explicit badge
+                // Better heuristic: if no "Claim this business" button, it's already claimed
+                let claimed = (await page.$('[aria-label*="Claim this business"]')) === null;
+
+                // Fallback: if has website AND phone, assume claimed
+                if (!claimed && website && phone) {
+                    claimed = true; // Likely claimed if they added full contact info
+                }
 
                 // Extract social media links
                 const socialLinks = {
