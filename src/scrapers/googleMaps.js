@@ -59,20 +59,22 @@ export const scrapeGoogleMaps = async ({
         },
 
         // Set realistic browser context
-        async preNavigationHooks({ page, request }) {
-            // Set realistic viewport
-            await page.setViewport({ width: 1920, height: 1080 });
+        preNavigationHooks: [
+            async ({ page, request }) => {
+                // Set realistic viewport
+                await page.setViewport({ width: 1920, height: 1080 });
 
-            // Set realistic user agent
-            await page.setUserAgent(
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            );
+                // Set realistic user agent
+                await page.setUserAgent(
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                );
 
-            // Remove webdriver flag
-            await page.evaluateOnNewDocument(() => {
-                Object.defineProperty(navigator, 'webdriver', { get: () => false });
-            });
-        },
+                // Remove webdriver flag
+                await page.evaluateOnNewDocument(() => {
+                    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+                });
+            },
+        ],
 
         async requestHandler({ page, request }) {
             console.log(`🌐 Loading: ${request.url}`);
@@ -425,15 +427,17 @@ export const scrapeGoogleMaps = async ({
         },
 
         // Same anti-bot measures
-        async preNavigationHooks({ page }) {
-            await page.setViewport({ width: 1920, height: 1080 });
-            await page.setUserAgent(
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            );
-            await page.evaluateOnNewDocument(() => {
-                Object.defineProperty(navigator, 'webdriver', { get: () => false });
-            });
-        },
+        preNavigationHooks: [
+            async ({ page }) => {
+                await page.setViewport({ width: 1920, height: 1080 });
+                await page.setUserAgent(
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                );
+                await page.evaluateOnNewDocument(() => {
+                    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+                });
+            },
+        ],
 
         async requestHandler({ page, request }) {
             const leadData = request.userData;
