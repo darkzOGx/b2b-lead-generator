@@ -231,10 +231,11 @@
     "proxy": {
       "title": "Proxy Configuration",
       "type": "object",
-      "description": "Proxy settings for scraping. Try without proxies first (faster). Use RESIDENTIAL or BUYPROXIES if you get blocked by Google.",
+      "description": "Proxy settings for scraping. SHADER (datacenter) proxies are fast, reliable, and cost-effective for Google Maps.",
       "editor": "proxy",
       "default": {
-        "useApifyProxy": false
+        "useApifyProxy": true,
+        "apifyProxyGroups": ["SHADER"]
       }
     },
 
