@@ -334,8 +334,22 @@ export const scrapeGoogleMaps = async ({
                 // Now visit each business detail page to get full information
                 for (const [index, lead] of leads.entries()) {
                     try {
-                        // Navigate to business detail page
-                        await page.goto(lead.googleMapsUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+                        // Check if page is still connected, recreate if needed
+                        if (page.isClosed()) {
+                            console.log('⚠️ Page was closed, skipping detail fetch for', lead.businessName);
+                            continue;
+                        }
+
+                        // Add delay between requests to avoid rate limiting
+                        if (index > 0) {
+                            await page.waitForTimeout(1000 + Math.random() * 1000); // 1-2 second delay
+                        }
+
+                        // Navigate to business detail page with shorter timeout
+                        await page.goto(lead.googleMapsUrl, {
+                            waitUntil: 'domcontentloaded', // Less strict than networkidle2
+                            timeout: 20000
+                        });
                         await page.waitForTimeout(1500);
 
                         // Extract detailed information
@@ -432,10 +446,17 @@ export const scrapeGoogleMaps = async ({
                         }
 
                     } catch (detailError) {
-                        console.warn(`⚠️ Failed to get details for ${lead.businessName}`, {
-                            error: detailError.message,
-                        });
-                        // Keep the lead with basic info
+                        console.warn(`⚠️ Failed to get details for ${lead.businessName}: ${detailError.message}`);
+
+                        // If browser disconnected, we can't continue with this page
+                        if (detailError.message?.includes('disconnected') ||
+                            detailError.message?.includes('closed') ||
+                            detailError.message?.includes('crashed')) {
+                            console.log('🔥 Browser issue detected, stopping detail fetch for remaining leads');
+                            break; // Stop trying to fetch more details
+                        }
+
+                        // For other errors, keep the lead with basic info and continue
                     }
                 }
 
