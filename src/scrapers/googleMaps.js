@@ -20,15 +20,18 @@ export const scrapeGoogleMaps = async ({
     proxyConfig,
     maxConcurrency = 5,
     fastMode = false, // Skip detail pages for 10x speed
+    language = 'en', // Language code
+    skipClosedPlaces = true, // Filter out permanently closed places
+    enrichment = {}, // Enrichment options (extractReviews, maxReviewsPerPlace, etc.)
 }) => {
     const leads = [];
     const processedUrls = new Set();
 
-    // Construct Google Maps search URL
+    // Construct Google Maps search URL with language
     const searchQuery = `${category} in ${location}`;
-    const searchUrl = `https://www.google.com/maps/search/${encodeURIComponent(searchQuery)}`;
+    const searchUrl = `https://www.google.com/maps/search/${encodeURIComponent(searchQuery)}?hl=${language}`;
 
-    console.log(`🔍 Searching Google Maps: "${searchQuery}"`);
+    console.log(`🔍 Searching Google Maps: "${searchQuery}" (language: ${language})`);
 
     // Set up proxy configuration with fallback
     let proxyConfiguration;
@@ -519,6 +522,17 @@ export const scrapeGoogleMaps = async ({
                     }
                 } catch (e) {}
 
+                // Check if place is permanently closed
+                const isClosed = (await page.$('[aria-label*="Permanently closed"]')) !== null ||
+                                (await page.$('[aria-label*="Closed permanently"]')) !== null ||
+                                (await page.evaluate(() => document.body.textContent.includes('Permanently closed')));
+
+                // Skip if closed and filter is enabled
+                if (skipClosedPlaces && isClosed) {
+                    console.log(`⏭️ Skipped (closed): ${leadData.businessName}`);
+                    return;
+                }
+
                 // Check if listing is claimed (business owner verified)
                 // Most legitimate businesses ARE claimed but don't show explicit badge
                 // Better heuristic: if no "Claim this business" button, it's already claimed
@@ -537,6 +551,70 @@ export const scrapeGoogleMaps = async ({
                     instagram: await page.$eval('a[href*="instagram.com"]', (el) => el.href).catch(() => null),
                 };
 
+                // Extract reviews if enabled
+                let reviews = [];
+                if (leadData.extractReviews && leadData.maxReviewsPerPlace > 0) {
+                    try {
+                        console.log(`📝 Extracting ${leadData.maxReviewsPerPlace} reviews for: ${leadData.businessName}`);
+
+                        // Click on reviews tab
+                        const reviewsButton = await page.$('button[aria-label*="Reviews"]');
+                        if (reviewsButton) {
+                            await reviewsButton.click();
+                            await page.waitForTimeout(2000); // Wait for reviews to load
+
+                            // Scroll to load more reviews
+                            const reviewsContainer = await page.$('[role="feed"]');
+                            if (reviewsContainer) {
+                                for (let i = 0; i < Math.ceil(leadData.maxReviewsPerPlace / 10); i++) {
+                                    await page.evaluate(() => {
+                                        const feed = document.querySelector('[role="feed"]');
+                                        if (feed) feed.scrollTop = feed.scrollHeight;
+                                    });
+                                    await page.waitForTimeout(1000);
+                                }
+
+                                // Extract review data
+                                reviews = await page.evaluate((maxReviews) => {
+                                    const reviewElements = document.querySelectorAll('[data-review-id]');
+                                    const extractedReviews = [];
+
+                                    for (let i = 0; i < Math.min(reviewElements.length, maxReviews); i++) {
+                                        const reviewEl = reviewElements[i];
+                                        try {
+                                            const ratingEl = reviewEl.querySelector('[role="img"][aria-label*="star"]');
+                                            const ratingText = ratingEl?.getAttribute('aria-label') || '';
+                                            const ratingMatch = ratingText.match(/(\d+)\s*star/i);
+                                            const rating = ratingMatch ? parseInt(ratingMatch[1]) : null;
+
+                                            const textEl = reviewEl.querySelector('[class*="review-text"], [class*="MyEned"]');
+                                            const text = textEl?.textContent?.trim() || '';
+
+                                            const authorEl = reviewEl.querySelector('[class*="author"], [class*="d4r55"]');
+                                            const author = authorEl?.textContent?.trim() || 'Anonymous';
+
+                                            const dateEl = reviewEl.querySelector('[class*="date"], [class*="rsqaWe"]');
+                                            const date = dateEl?.textContent?.trim() || '';
+
+                                            if (text || rating) {
+                                                extractedReviews.push({ rating, text, author, date });
+                                            }
+                                        } catch (e) {
+                                            // Skip failed review extraction
+                                        }
+                                    }
+
+                                    return extractedReviews;
+                                }, leadData.maxReviewsPerPlace);
+
+                                console.log(`✅ Extracted ${reviews.length} reviews`);
+                            }
+                        }
+                    } catch (reviewError) {
+                        console.warn(`⚠️ Failed to extract reviews: ${reviewError.message}`);
+                    }
+                }
+
                 // Create complete lead object
                 const lead = {
                     businessName: leadData.businessName,
@@ -549,6 +627,7 @@ export const scrapeGoogleMaps = async ({
                     category,
                     claimed,
                     socialLinks,
+                    reviews, // Customer reviews (if extracted)
                 };
 
                 // Debug: Log extracted data
@@ -623,6 +702,8 @@ export const scrapeGoogleMaps = async ({
             businessName: lead.businessName,
             rating: lead.rating,
             reviewCount: lead.reviewCount,
+            extractReviews: enrichment?.extractReviews || false,
+            maxReviewsPerPlace: enrichment?.maxReviewsPerPlace || 10,
         },
     }));
 

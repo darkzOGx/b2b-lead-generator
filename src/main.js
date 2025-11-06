@@ -58,6 +58,9 @@ try {
                     proxyConfig: input.proxy,
                     maxConcurrency: input.maxConcurrency || 5,
                     fastMode: true,
+                    language: input.language || 'en',
+                    skipClosedPlaces: input.skipClosedPlaces !== false,
+                    enrichment: input.enrichment || {},
                 });
 
                 console.log(`✅ Query ${index + 1}: Found ${rawLeads.length} businesses`);
@@ -96,6 +99,9 @@ try {
                     proxyConfig: input.proxy,
                     maxConcurrency: input.maxConcurrency || 5,
                     fastMode: input.fastMode || false,
+                    language: input.language || 'en',
+                    skipClosedPlaces: input.skipClosedPlaces !== false,
+                    enrichment: input.enrichment || {},
                 });
 
                 console.log(`✅ Found ${rawLeads.length} businesses from Google Maps`);
