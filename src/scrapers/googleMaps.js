@@ -23,6 +23,7 @@ export const scrapeGoogleMaps = async ({
     language = 'en', // Language code
     skipClosedPlaces = true, // Filter out permanently closed places
     enrichment = {}, // Enrichment options (extractReviews, maxReviewsPerPlace, etc.)
+    onLeadScraped = null, // Callback function called for each successfully scraped lead
 }) => {
     const leads = [];
     const processedUrls = new Set();
@@ -676,6 +677,15 @@ export const scrapeGoogleMaps = async ({
                 if (shouldInclude) {
                     detailedLeads.push(lead);
                     console.log(`✅ Added: ${lead.businessName} (${lead.website || 'no website'})`);
+
+                    // Call callback immediately to save data incrementally
+                    if (onLeadScraped) {
+                        try {
+                            await onLeadScraped(lead);
+                        } catch (callbackError) {
+                            console.error(`❌ onLeadScraped callback failed: ${callbackError.message}`);
+                        }
+                    }
                 } else {
                     console.log(`🚫 Filtered: ${lead.businessName} - Reasons: ${filterReasons.join(', ')}`);
                 }
@@ -685,7 +695,7 @@ export const scrapeGoogleMaps = async ({
             }
         },
 
-        failedRequestHandler({ request, error }) {
+        async failedRequestHandler({ request, error }) {
             console.warn(`⚠️ Request failed for ${request.userData.businessName}: ${error.message}`);
 
             // Still add partial data even if detail fetch fails
@@ -705,6 +715,15 @@ export const scrapeGoogleMaps = async ({
 
             detailedLeads.push(partialLead);
             console.log(`⚠️ Added partial data for: ${partialLead.businessName}`);
+
+            // Call callback immediately to save partial data
+            if (onLeadScraped) {
+                try {
+                    await onLeadScraped(partialLead);
+                } catch (callbackError) {
+                    console.error(`❌ onLeadScraped callback failed: ${callbackError.message}`);
+                }
+            }
         },
     });
 

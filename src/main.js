@@ -92,25 +92,9 @@ try {
     console.log(`📍 Searching: "${query.category}" in "${query.location}"`);
 
     try {
-        // Step 1: Scrape Google Maps
-        const rawLeads = await scrapeGoogleMaps({
-            category: query.category,
-            location: query.location,
-            maxResults: query.maxResults || 50,
-            filters: input.filters || {},
-            proxyConfig: input.proxy,
-            maxConcurrency: input.maxConcurrency || 5,
-            fastMode: false, // Always full mode for email extraction
-            language: input.language || 'en',
-            skipClosedPlaces: input.skipClosedPlaces !== false,
-            enrichment: input.enrichment || {},
-        });
-
-        console.log(`✅ Found ${rawLeads.length} businesses from Google Maps`);
-        stats.totalLeads = rawLeads.length;
-
-        // Step 2: Enrich each lead
-        for (const [leadIndex, lead] of rawLeads.entries()) {
+        // Step 1: Scrape Google Maps with incremental saving
+        // Pass callback to enrich and save each lead as it's scraped
+        const processAndSaveLead = async (lead) => {
             try {
                 let enrichedLead = { ...lead };
 
@@ -177,16 +161,12 @@ try {
                     }
                 }
 
-                // Push enriched lead to dataset
+                // 💾 SAVE IMMEDIATELY to dataset (incremental saving)
                 await Actor.pushData(enrichedLead);
                 stats.enrichedLeads++;
+                stats.totalLeads++;
 
-                // Progress logging every 10 leads
-                if ((leadIndex + 1) % 10 === 0) {
-                    console.log(
-                        `⏳ Progress: ${leadIndex + 1}/${rawLeads.length} leads processed`
-                    );
-                }
+                console.log(`💾 Saved lead #${stats.enrichedLeads}: ${enrichedLead.businessName}`);
 
             } catch (enrichError) {
                 console.error(`❌ Failed to enrich lead: ${lead.businessName}`, enrichError.message);
@@ -198,8 +178,26 @@ try {
                     scrapedAt: new Date().toISOString(),
                 });
                 stats.enrichedLeads++;
+                stats.totalLeads++;
             }
-        }
+        };
+
+        // Call scrapeGoogleMaps with incremental callback
+        const rawLeads = await scrapeGoogleMaps({
+            category: query.category,
+            location: query.location,
+            maxResults: query.maxResults || 50,
+            filters: input.filters || {},
+            proxyConfig: input.proxy,
+            maxConcurrency: input.maxConcurrency || 5,
+            fastMode: false, // Always full mode for email extraction
+            language: input.language || 'en',
+            skipClosedPlaces: input.skipClosedPlaces !== false,
+            enrichment: input.enrichment || {},
+            onLeadScraped: processAndSaveLead, // 🔥 Callback for incremental saving
+        });
+
+        console.log(`✅ Scraping complete! Processed ${stats.totalLeads} leads`);
 
     } catch (queryError) {
         console.error(`❌ Failed to process query: "${query.category}" in "${query.location}"`, queryError.message);
