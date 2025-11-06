@@ -1,0 +1,66 @@
+{
+  "actorSpecification": 1,
+  "name": "b2b-lead-generator",
+  "title": "B2B Lead Generator - Google Maps Scraper with Email Finder",
+  "version": "1.0",
+  "description": "Generate verified B2B leads from Google Maps with decision-maker contacts, email validation, and AI-powered lead scoring. Perfect for sales teams and agencies.",
+  "categories": ["BUSINESS", "ECOMMERCE", "MARKETING"],
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "input": "./input_schema.json",
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "title": "Enriched B2B Leads",
+      "description": "Sales-ready leads with validated emails, company data, and quality scores",
+      "views": {
+        "overview": {
+          "title": "All Leads",
+          "transformation": {
+            "fields": [
+              "businessName",
+              "email",
+              "phone",
+              "website",
+              "leadGrade",
+              "leadScore",
+              "rating",
+              "reviewCount",
+              "address",
+              "category"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "businessName": { "label": "Business Name", "format": "text" },
+              "email": { "label": "Email", "format": "text" },
+              "phone": { "label": "Phone", "format": "text" },
+              "website": { "label": "Website", "format": "link" },
+              "leadGrade": { "label": "Grade", "format": "text" },
+              "leadScore": { "label": "Score", "format": "number" },
+              "rating": { "label": "Rating", "format": "number" },
+              "reviewCount": { "label": "Reviews", "format": "number" }
+            }
+          }
+        },
+        "high-quality": {
+          "title": "High-Quality Leads (A+ & A)",
+          "transformation": {
+            "fields": [
+              "businessName",
+              "email",
+              "phone",
+              "website",
+              "leadGrade",
+              "leadScore"
+            ]
+          },
+          "display": {
+            "component": "table"
+          }
+        }
+      }
+    }
+  }
+}

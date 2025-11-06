@@ -1,0 +1,212 @@
+{
+  "title": "B2B Lead Generator - Input Configuration",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "searchQueries": {
+      "title": "Search Queries",
+      "type": "array",
+      "description": "List of category + location combinations to scrape from Google Maps",
+      "editor": "json",
+      "prefill": [
+        {
+          "category": "software companies",
+          "location": "San Francisco, CA",
+          "maxResults": 100
+        }
+      ],
+      "example": [
+        {
+          "category": "marketing agencies",
+          "location": "New York, NY",
+          "maxResults": 500
+        },
+        {
+          "category": "tech startups",
+          "location": "Austin, TX",
+          "maxResults": 250
+        }
+      ]
+    },
+
+    "filters": {
+      "title": "Advanced Filters",
+      "type": "object",
+      "description": "Filter businesses by quality signals to improve lead quality",
+      "editor": "json",
+      "default": {
+        "minRating": 4.0,
+        "minReviews": 10,
+        "hasWebsite": true,
+        "claimedListing": true
+      },
+      "properties": {
+        "minRating": {
+          "title": "Minimum Rating",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 4.0,
+          "description": "Only scrape businesses with rating >= this value (0-5 stars)"
+        },
+        "minReviews": {
+          "title": "Minimum Reviews",
+          "type": "integer",
+          "minimum": 0,
+          "default": 10,
+          "description": "Filter out businesses with too few reviews (indicates low activity)"
+        },
+        "hasWebsite": {
+          "title": "Must Have Website",
+          "type": "boolean",
+          "default": true,
+          "description": "Only include businesses with websites (required for email extraction)"
+        },
+        "hasSocialMedia": {
+          "title": "Must Have Social Media",
+          "type": "boolean",
+          "default": false,
+          "description": "Only include businesses with LinkedIn/Facebook/Twitter profiles"
+        },
+        "claimedListing": {
+          "title": "Claimed Listing Only",
+          "type": "boolean",
+          "default": true,
+          "description": "Only active businesses that claimed their Google listing"
+        }
+      }
+    },
+
+    "enrichment": {
+      "title": "Data Enrichment Options",
+      "type": "object",
+      "description": "Additional data to enrich leads with (increases compute cost but improves lead quality)",
+      "editor": "json",
+      "default": {
+        "extractEmails": true,
+        "validateContacts": false,
+        "companyData": false,
+        "techStack": false,
+        "findDecisionMakers": false
+      },
+      "properties": {
+        "extractEmails": {
+          "title": "Extract Emails from Websites",
+          "type": "boolean",
+          "default": true,
+          "description": "Visit websites and extract contact emails (adds ~0.01 CU/lead)"
+        },
+        "validateContacts": {
+          "title": "Validate Email/Phone",
+          "type": "boolean",
+          "default": false,
+          "description": "Verify email deliverability and phone validity (adds ~0.01 CU/lead)"
+        },
+        "companyData": {
+          "title": "Enrich Company Data",
+          "type": "boolean",
+          "default": false,
+          "description": "Add employee count, revenue, industry, funding info (adds ~0.02 CU/lead)"
+        },
+        "techStack": {
+          "title": "Detect Technology Stack",
+          "type": "boolean",
+          "default": false,
+          "description": "Identify CRM, marketing tools, hosting provider (adds ~0.01 CU/lead)"
+        },
+        "findDecisionMakers": {
+          "title": "Find Decision Makers",
+          "type": "boolean",
+          "default": false,
+          "description": "Search for CEO, CTO, CMO contacts on LinkedIn (adds ~0.03 CU/lead)"
+        }
+      }
+    },
+
+    "scoring": {
+      "title": "Lead Scoring Configuration",
+      "type": "object",
+      "description": "Calculate lead quality scores (A+ to F) based on your ideal customer profile",
+      "editor": "json",
+      "default": {
+        "enableScoring": true
+      },
+      "properties": {
+        "enableScoring": {
+          "title": "Enable Lead Scoring",
+          "type": "boolean",
+          "default": true,
+          "description": "Score leads A+ to F based on quality signals"
+        },
+        "idealCustomerProfile": {
+          "title": "Ideal Customer Profile (ICP)",
+          "type": "object",
+          "description": "Define scoring weights for your perfect customer",
+          "editor": "json",
+          "default": {
+            "industries": {
+              "technology": 30,
+              "professional_services": 25,
+              "healthcare": 20,
+              "manufacturing": 15,
+              "retail": 10
+            },
+            "locations": {
+              "North America": 30,
+              "Europe": 25,
+              "APAC": 20,
+              "Other": 10
+            }
+          }
+        }
+      }
+    },
+
+    "output": {
+      "title": "Output & Integration Options",
+      "type": "object",
+      "description": "Configure how results are delivered",
+      "editor": "json",
+      "default": {
+        "format": "csv"
+      },
+      "properties": {
+        "format": {
+          "title": "Export Format",
+          "type": "string",
+          "enum": ["json", "csv", "xlsx"],
+          "default": "csv",
+          "description": "Format for downloaded results"
+        },
+        "webhook": {
+          "title": "Webhook URL (Optional)",
+          "type": "string",
+          "editor": "textfield",
+          "pattern": "^https?://.*",
+          "description": "POST results to this URL when actor finishes (for Zapier, Make.com, etc)"
+        }
+      }
+    },
+
+    "proxy": {
+      "title": "Proxy Configuration",
+      "type": "object",
+      "description": "Proxy settings for scraping (recommended: use Apify residential proxies)",
+      "editor": "proxy",
+      "default": {
+        "useApifyProxy": true,
+        "apifyProxyGroups": ["RESIDENTIAL"]
+      }
+    },
+
+    "maxConcurrency": {
+      "title": "Max Concurrency",
+      "type": "integer",
+      "description": "Maximum concurrent requests (higher = faster but more compute cost)",
+      "minimum": 1,
+      "maximum": 20,
+      "default": 5
+    }
+  },
+  "required": ["searchQueries"]
+}

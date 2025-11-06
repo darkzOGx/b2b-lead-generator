@@ -1,0 +1,42 @@
+{
+  "searchQueries": [
+    {
+      "category": "coffee shops",
+      "location": "Seattle, WA",
+      "maxResults": 10
+    }
+  ],
+  "filters": {
+    "minRating": 4.0,
+    "minReviews": 5,
+    "hasWebsite": true,
+    "claimedListing": true
+  },
+  "enrichment": {
+    "extractEmails": true,
+    "validateContacts": false,
+    "companyData": false,
+    "techStack": false,
+    "findDecisionMakers": false
+  },
+  "scoring": {
+    "enableScoring": true,
+    "idealCustomerProfile": {
+      "industries": {
+        "food_service": 30,
+        "retail": 25,
+        "hospitality": 20
+      },
+      "locations": {
+        "North America": 30,
+        "Europe": 25,
+        "APAC": 20,
+        "Other": 10
+      }
+    }
+  },
+  "output": {
+    "format": "csv"
+  },
+  "maxConcurrency": 3
+}

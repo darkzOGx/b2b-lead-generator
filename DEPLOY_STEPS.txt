@@ -1,0 +1,76 @@
+═══════════════════════════════════════════════════════════
+🚀 DEPLOY YOUR APIFY ACTOR - 3 SIMPLE STEPS
+═══════════════════════════════════════════════════════════
+
+📍 Current Directory: C:\Users\OCPCz\Desktop\apify\b2b-lead-generator
+
+═══════════════════════════════════════════════════════════
+STEP 1: LOGIN TO APIFY (2 minutes)
+═══════════════════════════════════════════════════════════
+
+Run this command in PowerShell:
+
+    apify login
+
+What happens:
+✓ Opens browser automatically
+✓ Login with GitHub/Google (recommended)
+✓ Or create new account (free $5 credit)
+✓ Authenticates CLI automatically
+
+Expected output:
+    ✔ You are logged in as your-username!
+
+═══════════════════════════════════════════════════════════
+STEP 2: DEPLOY YOUR ACTOR (5 minutes)
+═══════════════════════════════════════════════════════════
+
+Run this command:
+
+    apify push
+
+What happens:
+✓ Uploads your code to Apify
+✓ Builds Docker image
+✓ Creates actor on platform
+✓ Gives you shareable URL
+
+Expected output:
+    Building actor...
+    ✔ Successfully pushed!
+    Actor URL: https://console.apify.com/actors/YOUR-ACTOR-ID
+
+═══════════════════════════════════════════════════════════
+STEP 3: TEST WITH REAL DATA (3 minutes)
+═══════════════════════════════════════════════════════════
+
+Run this command:
+
+    apify call
+
+Or go to the web console and click "Start"
+
+Test with:
+    Category: coffee shops
+    Location: Seattle, WA
+    Max Results: 10
+    Enable: Extract Emails ✓
+
+Expected results:
+    10 real coffee shops from Google Maps
+    With validated emails
+    Scored A+ to F
+    Takes 2-5 minutes
+
+═══════════════════════════════════════════════════════════
+COST: ~$0.50 for 10 leads (uses your free $5 credit)
+═══════════════════════════════════════════════════════════
+
+💰 REVENUE POTENTIAL AFTER LAUNCH:
+    100 users × $50/month = $4,000/month
+    500 users × $75/month = $30,000/month
+    1000 users × $100/month = $80,000/month
+
+═══════════════════════════════════════════════════════════
+🎉 YOUR ACTOR IS READY! RUN: apify login
+═══════════════════════════════════════════════════════════

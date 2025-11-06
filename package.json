@@ -1,0 +1,35 @@
+{
+  "name": "b2b-lead-generator",
+  "version": "1.0.0",
+  "description": "B2B Lead Generation from Google Maps with email finder, validation, and lead scoring",
+  "type": "module",
+  "main": "src/main.js",
+  "author": "Your Name",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "apify": "^3.1.0",
+    "crawlee": "^3.5.0",
+    "cheerio": "^1.0.0-rc.12",
+    "puppeteer": "^21.0.0"
+  },
+  "devDependencies": {
+    "@apify/eslint-config": "^0.4.0",
+    "eslint": "^8.50.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/b2b-lead-generator"
+  },
+  "keywords": [
+    "apify",
+    "lead-generation",
+    "google-maps",
+    "b2b",
+    "email-finder",
+    "sales-prospecting"
+  ]
+}
