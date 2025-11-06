@@ -30,20 +30,38 @@ export const scrapeGoogleMaps = async ({
 
     console.log(`🔍 Searching Google Maps: "${searchQuery}"`);
 
-    // Set up proxy configuration
-    const proxyConfiguration = proxyConfig?.useApifyProxy
-        ? await Actor.createProxyConfiguration({
-              groups: proxyConfig.apifyProxyGroups || ['RESIDENTIAL'],
-              countryCode: proxyConfig.countryCode,
-          })
-        : undefined;
+    // Set up proxy configuration with fallback
+    let proxyConfiguration;
+    if (proxyConfig?.useApifyProxy) {
+        try {
+            // Try user's preferred proxy groups first
+            proxyConfiguration = await Actor.createProxyConfiguration({
+                groups: proxyConfig.apifyProxyGroups || ['RESIDENTIAL'],
+                countryCode: proxyConfig.countryCode,
+            });
+            console.log(`🔒 Using proxy groups: ${proxyConfig.apifyProxyGroups?.join(', ') || 'RESIDENTIAL'}`);
+        } catch (proxyError) {
+            console.warn(`⚠️ Proxy setup failed: ${proxyError.message}`);
+            // Fallback: Try without country restriction
+            try {
+                proxyConfiguration = await Actor.createProxyConfiguration({
+                    groups: ['RESIDENTIAL', 'SHADER'],
+                });
+                console.log('🔒 Using fallback proxies (RESIDENTIAL + SHADER)');
+            } catch (fallbackError) {
+                console.warn('⚠️ All proxies failed, continuing without proxies');
+                proxyConfiguration = undefined;
+            }
+        }
+    }
 
     const crawler = new PuppeteerCrawler({
         proxyConfiguration,
         // Fast mode: can be more aggressive since we're only doing listing pages
         maxConcurrency: fastMode ? Math.min(maxConcurrency, 5) : Math.min(maxConcurrency, 3),
         maxRequestRetries: 3,
-        requestHandlerTimeoutSecs: 120,
+        requestHandlerTimeoutSecs: 90, // Reduced from 120 for faster failures
+        navigationTimeoutSecs: 45, // Fail faster on navigation issues
 
         launchContext: {
             launchOptions: {
