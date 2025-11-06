@@ -40,7 +40,7 @@ export const scrapeGoogleMaps = async ({
             // Try user's preferred proxy groups first
             const proxyGroups = (proxyConfig.apifyProxyGroups && proxyConfig.apifyProxyGroups.length > 0)
                 ? proxyConfig.apifyProxyGroups
-                : ['SHADER']; // Default to SHADER for best performance
+                : ['DATACENTER']; // Default to datacenter proxies for best performance
 
             proxyConfiguration = await Actor.createProxyConfiguration({
                 groups: proxyGroups,
@@ -52,9 +52,9 @@ export const scrapeGoogleMaps = async ({
             // Fallback: Try without country restriction
             try {
                 proxyConfiguration = await Actor.createProxyConfiguration({
-                    groups: ['RESIDENTIAL', 'SHADER'],
+                    groups: ['DATACENTER'],
                 });
-                console.log('🔒 Using fallback proxies (RESIDENTIAL + SHADER)');
+                console.log('🔒 Using fallback proxies (DATACENTER)');
             } catch (fallbackError) {
                 console.warn('⚠️ All proxies failed, continuing without proxies');
                 proxyConfiguration = undefined;
