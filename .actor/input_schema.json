@@ -251,8 +251,8 @@
     "fastMode": {
       "title": "Fast Mode (Listing Page Only)",
       "type": "boolean",
-      "description": "Skip detail pages for 10x faster scraping. Returns: name, rating, reviews, Google Maps URL only. Enable for quick bulk scraping.",
-      "default": false
+      "description": "Skip detail pages for 10x faster scraping. Returns: name, rating, reviews, Google Maps URL only. Disable for full details (website, phone, email).",
+      "default": true
     }
   },
   "required": ["searchQueries"]
