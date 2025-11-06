@@ -45,12 +45,14 @@
         "minRating": 4.0,
         "minReviews": 10,
         "hasWebsite": true,
+        "hasSocialMedia": false,
         "claimedListing": true
       },
       "prefill": {
         "minRating": 4.0,
         "minReviews": 10,
         "hasWebsite": true,
+        "hasSocialMedia": false,
         "claimedListing": true
       },
       "properties": {
