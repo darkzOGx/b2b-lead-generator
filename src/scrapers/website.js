@@ -35,11 +35,11 @@ export const extractEmailFromWebsite = async (websiteUrl) => {
     ];
 
     const crawler = new CheerioCrawler({
-        maxRequestsPerCrawl: maxPagesToVisit,
+        maxRequestsPerCrawl: 1000, // High limit to avoid global counter issues
         maxConcurrency: 1,
         maxRequestRetries: 2,
         requestHandlerTimeoutSecs: 30,
-        // Force unique request queue for each crawler instance
+        // Each email extraction gets its own queue
         requestQueue: await Actor.openRequestQueue(),
 
         async requestHandler({ $, request, enqueueLinks }) {

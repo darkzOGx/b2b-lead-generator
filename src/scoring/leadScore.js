@@ -87,17 +87,41 @@ export const calculateLeadScore = (lead, icp = {}) => {
 
     // Industry match (0-30 points based on ICP)
     if (lead.category && icp.industries) {
-        const industry = findClosestIndustry(lead.category, icp.industries);
-        if (industry) {
-            firmographicScore += icp.industries[industry];
+        // Handle both array format (old) and object format (new)
+        if (Array.isArray(icp.industries)) {
+            // Old format: ["Software", "Technology"] - give 30 points if match
+            const matchesIndustry = icp.industries.some(ind =>
+                lead.category.toLowerCase().includes(ind.toLowerCase())
+            );
+            if (matchesIndustry) {
+                firmographicScore += 30; // Default weight for array format
+            }
+        } else {
+            // New format: { technology: 30, healthcare: 20 }
+            const industry = findClosestIndustry(lead.category, icp.industries);
+            if (industry) {
+                firmographicScore += icp.industries[industry];
+            }
         }
     }
 
     // Location match (0-30 points based on ICP)
     if (lead.address && icp.locations) {
-        const region = determineRegion(lead.address);
-        if (region && icp.locations[region]) {
-            firmographicScore += icp.locations[region];
+        // Handle both array format (old) and object format (new)
+        if (Array.isArray(icp.locations)) {
+            // Old format: ["San Francisco", "California"] - give 30 points if match
+            const matchesLocation = icp.locations.some(loc =>
+                lead.address.toLowerCase().includes(loc.toLowerCase())
+            );
+            if (matchesLocation) {
+                firmographicScore += 30; // Default weight for array format
+            }
+        } else {
+            // New format: { "North America": 30, "Europe": 25 }
+            const region = determineRegion(lead.address);
+            if (region && icp.locations[region]) {
+                firmographicScore += icp.locations[region];
+            }
         }
     }
 
