@@ -300,7 +300,8 @@ export const scrapeGoogleMaps = async ({
                         if (leads.length >= maxResults) break;
 
                         // Apply initial filters with logging
-                        if (filters.minRating && (card.rating === null || card.rating < filters.minRating)) {
+                        // Allow null ratings to pass (will get rating from detail page)
+                        if (filters.minRating && card.rating !== null && card.rating < filters.minRating) {
                             filteredOut.noRating++;
                             continue;
                         }
