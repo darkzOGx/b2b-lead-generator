@@ -423,27 +423,41 @@ export const scrapeGoogleMaps = async ({
                     socialLinks,
                 };
 
+                // Debug: Log extracted data
+                console.log(`📊 Extracted data for ${lead.businessName}:`, {
+                    website: website || 'NONE',
+                    claimed: claimed ? 'YES' : 'NO',
+                    phone: phone || 'NONE',
+                    address: address || 'NONE',
+                });
+
                 // Apply additional filters
                 let shouldInclude = true;
+                const filterReasons = [];
 
                 if (filters.hasWebsite && !lead.website) {
                     shouldInclude = false;
+                    filterReasons.push('no website');
                 }
 
                 if (filters.claimedListing && !lead.claimed) {
                     shouldInclude = false;
+                    filterReasons.push('not claimed');
                 }
 
                 if (filters.hasSocialMedia) {
                     const hasSocial = Object.values(lead.socialLinks).some((link) => link !== null);
-                    if (!hasSocial) shouldInclude = false;
+                    if (!hasSocial) {
+                        shouldInclude = false;
+                        filterReasons.push('no social media');
+                    }
                 }
 
                 if (shouldInclude) {
                     detailedLeads.push(lead);
                     console.log(`✅ Added: ${lead.businessName} (${lead.website || 'no website'})`);
                 } else {
-                    console.log(`🚫 Filtered: ${lead.businessName}`);
+                    console.log(`🚫 Filtered: ${lead.businessName} - Reasons: ${filterReasons.join(', ')}`);
                 }
 
             } catch (error) {
