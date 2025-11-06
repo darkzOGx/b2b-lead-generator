@@ -445,8 +445,8 @@ export const scrapeGoogleMaps = async ({
     // Adjust settings based on proxy usage
     const usingProxies = proxyConfiguration !== undefined;
     const detailSettings = usingProxies
-        ? { concurrency: 2, navTimeout: 30, handlerTimeout: 45, retries: 2 } // Reduced from 3 to 2 to prevent memory overload
-        : { concurrency: 1, navTimeout: 45, handlerTimeout: 60, retries: 3 }; // No proxies = slower, more retries
+        ? { concurrency: 2, navTimeout: 60, handlerTimeout: 90, retries: 2 } // Increased timeouts to handle slow-loading pages
+        : { concurrency: 1, navTimeout: 60, handlerTimeout: 90, retries: 3 }; // No proxies = slower, more retries
 
     console.log(`⚙️ Detail crawler settings: ${usingProxies ? 'WITH' : 'WITHOUT'} proxies (concurrency: ${detailSettings.concurrency}, timeout: ${detailSettings.navTimeout}s)`);
 
@@ -488,9 +488,9 @@ export const scrapeGoogleMaps = async ({
             console.log(`🔍 Fetching details: ${leadData.businessName}`);
 
             try {
-                // Wait for page to load (adjust based on proxy usage)
-                const networkIdleTimeout = usingProxies ? 5000 : 5000;
-                const selectorTimeout = usingProxies ? 8000 : 8000;
+                // Wait for page to load (increased timeouts to handle slow pages)
+                const networkIdleTimeout = usingProxies ? 10000 : 10000;
+                const selectorTimeout = usingProxies ? 15000 : 15000;
 
                 await page.waitForNetworkIdle({ timeout: networkIdleTimeout }).catch(() => {});
 
