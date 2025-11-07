@@ -143,9 +143,9 @@ Scrape Google Maps in **10 languages**:
 **💡 How to set timeout:**
 Scroll down in the Input form to find **"⏱️ Timeout (Seconds)"** field.
 
-- For **100 leads**: Enter **3600** (1 hour)
-- For **500 leads**: Enter **14400** (4 hours)
-- For **1000 leads**: Enter **28800** (8 hours)
+- For **100 leads**: Enter **3600**
+- For **500 leads**: Enter **14400**
+- For **1000 leads**: Enter **28800**
 
 **Fast Mode** (basic data only) is **10x faster** at ~1,500 leads per hour.
 

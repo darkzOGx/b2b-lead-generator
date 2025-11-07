@@ -15,10 +15,8 @@ try {
 
     // Log timeout setting if provided
     if (rawInput.timeoutSeconds) {
-        const hours = Math.floor(rawInput.timeoutSeconds / 3600);
-        const minutes = Math.floor((rawInput.timeoutSeconds % 3600) / 60);
-        await Actor.setStatusMessage(`⏱️ Timeout: ${rawInput.timeoutSeconds}s (${hours}h ${minutes}m)`);
-        console.log(`⏱️ User set timeout: ${rawInput.timeoutSeconds} seconds (${hours}h ${minutes}m)`);
+        await Actor.setStatusMessage(`⏱️ Timeout: ${rawInput.timeoutSeconds} seconds`);
+        console.log(`⏱️ User set timeout: ${rawInput.timeoutSeconds} seconds`);
     }
 
     // Determine scraping mode
