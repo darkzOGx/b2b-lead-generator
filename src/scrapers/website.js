@@ -142,9 +142,9 @@ async function extractEmailWithCrawler(websiteUrl) {
                             // Remove phone number patterns from the start (e.g., "206-2832lauraeason@domain.com")
                             let cleaned = email.replace(/^[\d\s\-\.\(\)]+/, '');
 
-                            // Step 1: Extract email pattern - word boundary prevents matching into adjacent text
-                            // Match: localpart@domain.tld where TLD is 2+ letters, ended by word boundary
-                            const emailMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/);
+                            // Step 1: Extract email pattern - stop at TLD boundary
+                            // Match: localpart@domain.tld where TLD is 2+ letters, followed by non-letter or end
+                            const emailMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?=\s|[^a-zA-Z]|$)/);
                             if (!emailMatch) return null;
 
                             let extractedEmail = emailMatch[0];
@@ -243,18 +243,15 @@ async function extractEmailWithCrawler(websiteUrl) {
         await crawler.run([websiteUrl]);
     } catch (error) {
         console.log(`⚠️ Email extraction failed for ${websiteUrl}: ${error.message}`);
-        // Cleanup request queue
+    } finally {
+        // Cleanup request queue after crawler fully completes
+        // Use setTimeout to ensure all pending operations finish
+        await new Promise(resolve => setTimeout(resolve, 100));
         try {
             await requestQueue.drop();
-        } catch {}
-        return { email: null, socialLinks: foundSocialLinks };
-    }
-
-    // Cleanup request queue after use to prevent storage bloat
-    try {
-        await requestQueue.drop();
-    } catch (dropError) {
-        console.log(`⚠️ Failed to cleanup email queue ${queueId}: ${dropError.message}`);
+        } catch (dropError) {
+            // Silently ignore cleanup errors - queue might already be deleted
+        }
     }
 
     // Log found social links
