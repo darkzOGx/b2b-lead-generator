@@ -70,9 +70,13 @@ export const extractEmailFromWebsite = async (websiteUrl) => {
                     // Clean and validate emails
                     const cleanedEmails = rawEmails
                         .map((email) => {
-                            // Remove any non-email characters at start/end
-                            // Match ONLY the valid email part
-                            const cleanMatch = email.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                            // Remove phone number patterns from the start (e.g., "206-2832lauraeason@domain.com")
+                            // Phone patterns: (xxx) xxx-xxxx, xxx-xxx-xxxx, xxx.xxx.xxxx
+                            let cleaned = email.replace(/^[\d\s\-\.\(\)]+/, '');
+
+                            // Remove any remaining non-email characters at start
+                            // Match ONLY the valid email part (word chars + special chars before @)
+                            const cleanMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
                             return cleanMatch ? cleanMatch[0] : null;
                         })
                         .filter((email) => {
