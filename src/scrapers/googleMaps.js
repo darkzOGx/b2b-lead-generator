@@ -430,9 +430,22 @@ export const scrapeGoogleMaps = async ({
 
     console.log(`📋 Collected ${leads.length} business cards`);
 
-    // FAST MODE: Skip detail pages and return listing data only
+    // FAST MODE: Skip detail pages but still save listing data
     if (fastMode) {
         console.log(`⚡ Fast mode enabled - skipping detail page extraction`);
+
+        // Call callback for each lead to save data incrementally
+        if (onLeadScraped) {
+            for (const lead of leads) {
+                try {
+                    await onLeadScraped(lead);
+                    console.log(`💾 Saved (fast mode): ${lead.businessName}`);
+                } catch (callbackError) {
+                    console.error(`❌ Fast mode save failed for ${lead.businessName}: ${callbackError.message}`);
+                }
+            }
+        }
+
         console.log(`✅ Successfully scraped ${leads.length} businesses (fast mode)`);
         return leads;
     }
