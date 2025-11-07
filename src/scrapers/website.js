@@ -142,9 +142,9 @@ async function extractEmailWithCrawler(websiteUrl) {
                             // Remove phone number patterns from the start (e.g., "206-2832lauraeason@domain.com")
                             let cleaned = email.replace(/^[\d\s\-\.\(\)]+/, '');
 
-                            // Step 1: Extract email pattern with word boundary to stop at TLD end
-                            // Match: localpart@domain.tld where TLD is 2-6 letters
-                            const emailMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}\b/);
+                            // Step 1: Extract email pattern - use negative lookahead to stop after TLD
+                            // Match: localpart@domain.tld where TLD is 2+ letters, not followed by more letters
+                            const emailMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?![a-zA-Z])/);
                             if (!emailMatch) return null;
 
                             let extractedEmail = emailMatch[0];
