@@ -105,8 +105,9 @@ async function extractEmailWithCrawler(websiteUrl) {
 
                             // Remove any remaining non-email characters at start
                             // Match ONLY the valid email part (word chars + special chars before @)
-                            // CRITICAL FIX: Add word boundary \b at end to prevent "gmail.comCopyright"
-                            const cleanMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/);
+                            // CRITICAL FIX: Negative lookahead (?![a-zA-Z]) ensures no letters after TLD
+                            // Prevents: "gmail.comCopyright", "gettlergc.comjason", etc.
+                            const cleanMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}(?![a-zA-Z])/);
                             return cleanMatch ? cleanMatch[0] : null;
                         })
                         .filter((email) => {
