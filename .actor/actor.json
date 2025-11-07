@@ -1,9 +1,9 @@
 {
   "actorSpecification": 1,
-  "name": "google-maps-business-email-scraper-b2b-lead-generator",
-  "title": "Google Maps Business Email Scraper & B2B Lead Generator",
+  "name": "google-maps-email-scraper",
+  "title": "Google Maps Email Scraper & B2B Lead Generator with AI",
   "version": "2.1",
-  "description": "Scrape Google Maps for verified B2B leads with emails, phone numbers & addresses. AI-powered lead scoring. Export to CSV/Excel. Perfect for sales prospecting & agencies.",
+  "description": "Extract verified emails from Google Maps businesses. 70% email success rate, AI lead scoring A+ to F, phone numbers & addresses. Export to CSV/Excel.",
   "categories": ["BUSINESS", "ECOMMERCE", "MARKETING"],
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",
