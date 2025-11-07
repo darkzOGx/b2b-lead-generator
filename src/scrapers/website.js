@@ -142,17 +142,15 @@ async function extractEmailWithCrawler(websiteUrl) {
                             // Remove phone number patterns from the start (e.g., "206-2832lauraeason@domain.com")
                             let cleaned = email.replace(/^[\d\s\-\.\(\)]+/, '');
 
-                            // Step 1: Extract email pattern (more permissive - allows trailing junk)
+                            // Step 1: Extract email pattern with word boundary to stop at TLD end
                             // Match: localpart@domain.tld where TLD is 2-6 letters
-                            const emailMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}/);
+                            const emailMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}\b/);
                             if (!emailMatch) return null;
 
                             let extractedEmail = emailMatch[0];
 
-                            // Step 2: Trim trailing junk from the TLD (only if there's EXCESSIVE junk)
-                            // Remove any letters beyond a valid TLD (e.g., "gmail.comCopyright" → "gmail.com")
-                            // Only remove if there are 5+ trailing characters (catches "Copyright" but not valid TLDs)
-                            extractedEmail = extractedEmail.replace(/(\.[a-zA-Z]{2,6})([a-zA-Z]{5,})$/, '$1');
+                            // No post-processing needed - the initial regex is accurate enough
+                            // Any "cleanup" attempts cause more harm than good (truncating valid TLDs)
 
                             return extractedEmail;
                         })
