@@ -64,14 +64,17 @@ async function extractEmailWithCrawler(websiteUrl) {
         '.svg',
     ];
 
+    // PRODUCTION FIX: Create unique request queue for each email extraction to prevent collisions
+    const queueId = `email-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    const requestQueue = await Actor.openRequestQueue(queueId);
+
     const crawler = new CheerioCrawler({
         maxRequestsPerCrawl: maxPagesToVisit, // Limit pages to maxPagesToVisit
         maxConcurrency: 1,
         maxRequestRetries: 1,
         requestHandlerTimeoutSecs: 15, // Reduced for CPU overload
         navigationTimeoutSecs: 10, // Faster navigation
-        // Each email extraction gets its own queue
-        requestQueue: await Actor.openRequestQueue(),
+        requestQueue,
 
         async requestHandler({ $, request, enqueueLinks }) {
             // Skip if we already found an email
@@ -194,7 +197,18 @@ async function extractEmailWithCrawler(websiteUrl) {
         await crawler.run([websiteUrl]);
     } catch (error) {
         console.log(`⚠️ Email extraction failed for ${websiteUrl}: ${error.message}`);
+        // Cleanup request queue
+        try {
+            await requestQueue.drop();
+        } catch {}
         return null;
+    }
+
+    // Cleanup request queue after use to prevent storage bloat
+    try {
+        await requestQueue.drop();
+    } catch (dropError) {
+        console.log(`⚠️ Failed to cleanup email queue ${queueId}: ${dropError.message}`);
     }
 
     return foundEmail;
