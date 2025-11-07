@@ -64,23 +64,6 @@ This is the **ONLY** Google Maps scraper on Apify with **AI Lead Scoring (A+ to 
 
 ---
 
-## 💰 Pricing That Makes Sense
-
-### Recommended Plan: $59/month for 2,000 leads
-
-**Cost Breakdown:**
-- **Price per lead:** $0.03 (vs $0.50-$2.00 buying from lead vendors)
-- **ROI:** If just 1% convert to customers, that's 20 new customers/month
-- **Compute units:** ~60 CU for 2,000 leads with email extraction
-- **Free tier:** Generate 250 leads with $5 monthly Apify credit
-
-**Compare to alternatives:**
-- Lead vendors: $1,000-$4,000 for 2,000 leads
-- Manual research: 40+ hours @ $25/hr = $1,000+
-- This actor: $59/month (97% cost savings)
-
----
-
 ## 🚀 Core Features - What You Get
 
 ### 🎯 1. 100% Email Extraction
@@ -598,16 +581,6 @@ Higher = faster but uses more compute units and may cause memory issues.
 ## 📝 License
 
 MIT License - Free to use and modify
-
----
-
-## ⭐ Reviews
-
-> "Generated 2,500 leads in one day. Best prospecting tool I've used!" - Sarah M., Sales Manager
-
-> "Email validation saved us hours. 95% deliverability rate." - John K., Marketing Director
-
-> "Finally, a scraper that provides actual contact info, not just business names." - Mike R., Agency Owner
 
 ---
 
