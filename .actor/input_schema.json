@@ -19,9 +19,9 @@
       "editor": "select",
       "enum": ["balanced", "fast", "turbo"],
       "enumTitles": [
-        "⚖️ Balanced (8GB RAM) - 5 concurrent browsers, safe for all plans",
-        "🚀 Fast (16GB RAM) - 10 concurrent browsers, 2x faster",
-        "⚡ Turbo (32GB RAM) - 20 concurrent browsers, 4x faster"
+        "⚖️ Balanced (8GB RAM) - 3 main / 1 detail browser, recommended for best results",
+        "🚀 Fast (16GB RAM) - 5 main / 2 detail browsers, 2x faster",
+        "⚡ Turbo (32GB RAM) - 8 main / 3 detail browsers, 3x faster"
       ],
       "default": "balanced"
     },
@@ -127,7 +127,7 @@
     "enableScoring": {
       "title": "Enable AI Lead Scoring (A+ to F)",
       "type": "boolean",
-      "description": "Score leads based on data quality, engagement signals, and ICP fit. Scores: A+ (90+), A (80+), B (70+), C (60+), D (50+), F (<50)",
+      "description": "Score leads based on data quality, engagement signals, and ICP fit. Scores: A+ (85+), A (75+), B (65+), C (55+), D (45+), F (<45)",
       "default": true
     },
     "targetIndustries": {
@@ -161,10 +161,10 @@
     "maxConcurrency": {
       "title": "Max Concurrency (Advanced)",
       "type": "integer",
-      "description": "Maximum concurrent browser instances. Default is 5. Lower this to 2-3 if you experience memory issues.",
+      "description": "Maximum concurrent browser instances. Default is 3 for optimal performance. Higher values may cause CPU overload and timeouts.",
       "minimum": 1,
       "maximum": 10,
-      "default": 5
+      "default": 3
     }
   },
   "required": ["searchQuery", "location"]
