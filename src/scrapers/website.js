@@ -115,7 +115,19 @@ async function extractEmailWithCrawler(websiteUrl) {
                 const pageText = $('body').text();
 
                 // Find all email addresses
-                const rawEmails = pageText.match(emailRegex);
+                let rawEmails = pageText.match(emailRegex);
+
+                // Pre-filter: Remove obvious false positives (image files, etc.)
+                if (rawEmails) {
+                    rawEmails = rawEmails.filter((email) => {
+                        const lowerEmail = email.toLowerCase();
+                        // Exclude image files with @2x, @3x patterns
+                        if (lowerEmail.includes('@2x') || lowerEmail.includes('@3x')) return false;
+                        // Exclude if it ends with image/document extensions
+                        if (lowerEmail.match(/\.(png|jpg|jpeg|gif|svg|webp|pdf|doc|docx)$/i)) return false;
+                        return true;
+                    });
+                }
 
                 // DEBUG: Log what was searched
                 console.log(`🔍 Searched ${request.url} - Found ${rawEmails ? rawEmails.length : 0} potential emails`);
@@ -137,10 +149,10 @@ async function extractEmailWithCrawler(websiteUrl) {
 
                             let extractedEmail = emailMatch[0];
 
-                            // Step 2: Trim trailing junk from the TLD
+                            // Step 2: Trim trailing junk from the TLD (only if there's EXCESSIVE junk)
                             // Remove any letters beyond a valid TLD (e.g., "gmail.comCopyright" → "gmail.com")
-                            // Valid TLDs are 2-4 chars, so "comCopyright" should become "com"
-                            extractedEmail = extractedEmail.replace(/(\.[a-zA-Z]{2,4})[a-zA-Z]+$/, '$1');
+                            // Only remove if there are 5+ trailing characters (catches "Copyright" but not valid TLDs)
+                            extractedEmail = extractedEmail.replace(/(\.[a-zA-Z]{2,6})([a-zA-Z]{5,})$/, '$1');
 
                             return extractedEmail;
                         })
