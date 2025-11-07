@@ -133,9 +133,9 @@ async function extractEmailWithCrawler(websiteUrl) {
 
                             // Remove any remaining non-email characters at start
                             // Match ONLY the valid email part (word chars + special chars before @)
-                            // CRITICAL FIX: Limit TLD to 2-4 chars (covers .com, .net, .org, .edu, .co.uk, etc.)
-                            // This prevents matching junk: "gmail.comCopyright" stops at "gmail.com" (3 chars)
-                            const cleanMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/);
+                            // CRITICAL FIX: Limit TLD to 2-4 chars + word boundary to prevent junk
+                            // Examples: "gmail.comj" rejected, "gmail.com" accepted, "gmail.comH" rejected
+                            const cleanMatch = cleaned.match(/[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b/);
                             return cleanMatch ? cleanMatch[0] : null;
                         })
                         .filter((email) => {

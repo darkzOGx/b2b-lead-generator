@@ -147,16 +147,18 @@ export const calculateLeadScore = (lead, icp = {}) => {
     const normalizedScore = hasSocialLinks ? totalScore : (totalScore / maxPossibleScore) * 100;
 
     // ===== CALCULATE FINAL GRADE =====
+    // Adjusted thresholds for realistic B2B lead grading
+    // Most quality leads with email+phone+website should score A or A+
     let grade;
-    if (normalizedScore >= 90) {
+    if (normalizedScore >= 85) {
         grade = 'A+';
-    } else if (normalizedScore >= 80) {
+    } else if (normalizedScore >= 75) {
         grade = 'A';
-    } else if (normalizedScore >= 70) {
+    } else if (normalizedScore >= 65) {
         grade = 'B';
-    } else if (normalizedScore >= 60) {
+    } else if (normalizedScore >= 55) {
         grade = 'C';
-    } else if (normalizedScore >= 50) {
+    } else if (normalizedScore >= 45) {
         grade = 'D';
     } else {
         grade = 'F';
