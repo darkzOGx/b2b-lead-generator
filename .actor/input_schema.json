@@ -2,7 +2,7 @@
   "title": "B2B Lead Generator - Input Configuration",
   "type": "object",
   "schemaVersion": 1,
-  "description": "⚠️ TIMEOUT: Set in Run Options → Timeout field (in SECONDS). Enriched mode: ~150 leads/hour. 100 leads = 3600 sec (1hr), 500 leads = 14400 sec (4hrs), 1000 leads = 28800 sec (8hrs).",
+  "description": "⚠️ TIMEOUT: Scroll down to find timeout input fields. Enriched mode: ~150 leads/hour. 100 leads = 60 minutes, 500 leads = 4 hours, 1000 leads = 8 hours.",
   "properties": {
     "scrapingMode": {
       "title": "Scraping Mode",
@@ -45,7 +45,7 @@
     "maxResults": {
       "title": "Number of places to extract (per each search term or URL)",
       "type": "integer",
-      "description": "Maximum number of businesses to scrape. ⏱️ Performance: Enriched mode processes ~150 leads/hour. Set timeout accordingly: 50 leads = 1800 sec (30min), 100 leads = 3600 sec (1hr), 500 leads = 14400 sec (4hrs), 1000 leads = 28800 sec (8hrs).",
+      "description": "Maximum number of businesses to scrape. ⏱️ Set timeout below: 100 leads = 60 minutes, 500 leads = 4 hours, 1000 leads = 8 hours.",
       "minimum": 1,
       "maximum": 10000,
       "default": 50,
