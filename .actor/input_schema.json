@@ -2,7 +2,7 @@
   "title": "B2B Lead Generator - Input Configuration",
   "type": "object",
   "schemaVersion": 1,
-  "description": "⚠️ TIMEOUT: Set in Run Options → Timeout field. Use format 1:00:00 (1 hour) or 4:00:00 (4 hours). Enriched mode: ~150 leads/hour. 100 leads = 1 hour, 500 leads = 4 hours, 1000 leads = 8 hours.",
+  "description": "⚠️ TIMEOUT: Set in Run Options → Timeout field (in SECONDS). Enriched mode: ~150 leads/hour. 100 leads = 3600 sec (1hr), 500 leads = 14400 sec (4hrs), 1000 leads = 28800 sec (8hrs).",
   "properties": {
     "scrapingMode": {
       "title": "Scraping Mode",
@@ -45,7 +45,7 @@
     "maxResults": {
       "title": "Number of places to extract (per each search term or URL)",
       "type": "integer",
-      "description": "Maximum number of businesses to scrape. ⏱️ Performance: Enriched mode processes ~150 leads/hour. Set timeout accordingly: 50 leads = 30:00 (30min), 100 leads = 1:00:00 (1hr), 500 leads = 4:00:00 (4hrs), 1000 leads = 8:00:00 (8hrs).",
+      "description": "Maximum number of businesses to scrape. ⏱️ Performance: Enriched mode processes ~150 leads/hour. Set timeout accordingly: 50 leads = 1800 sec (30min), 100 leads = 3600 sec (1hr), 500 leads = 14400 sec (4hrs), 1000 leads = 28800 sec (8hrs).",
       "minimum": 1,
       "maximum": 10000,
       "default": 50,
@@ -139,6 +139,25 @@
       "editor": "stringList",
       "default": ["technology", "professional_services"],
       "example": ["technology", "healthcare", "professional_services"]
+    },
+
+    "timeoutMinutes": {
+      "title": "⏱️ Timeout (Minutes)",
+      "type": "integer",
+      "description": "Run timeout in MINUTES. For 100 leads use 60 min, 500 leads use 240 min, 1000 leads use 480 min. Leave empty to use hours field.",
+      "editor": "number",
+      "minimum": 1,
+      "maximum": 1440,
+      "example": 60
+    },
+    "timeoutHours": {
+      "title": "⏱️ Timeout (Hours)",
+      "type": "integer",
+      "description": "Run timeout in HOURS. For 100 leads use 1 hour, 500 leads use 4 hours, 1000 leads use 8 hours. Leave empty to use minutes field.",
+      "editor": "number",
+      "minimum": 1,
+      "maximum": 24,
+      "example": 4
     },
 
     "webhookUrl": {

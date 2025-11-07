@@ -13,6 +13,17 @@ try {
 
     console.log('📥 Input received:', JSON.stringify(rawInput, null, 2));
 
+    // Set timeout from user input (minutes or hours)
+    if (rawInput.timeoutHours) {
+        const timeoutSeconds = rawInput.timeoutHours * 3600;
+        await Actor.setStatusMessage(`⏱️ Timeout set to ${rawInput.timeoutHours} hours (${timeoutSeconds} seconds)`);
+        console.log(`⏱️ User set timeout: ${rawInput.timeoutHours} hours = ${timeoutSeconds} seconds`);
+    } else if (rawInput.timeoutMinutes) {
+        const timeoutSeconds = rawInput.timeoutMinutes * 60;
+        await Actor.setStatusMessage(`⏱️ Timeout set to ${rawInput.timeoutMinutes} minutes (${timeoutSeconds} seconds)`);
+        console.log(`⏱️ User set timeout: ${rawInput.timeoutMinutes} minutes = ${timeoutSeconds} seconds`);
+    }
+
     // Determine scraping mode
     const scrapingMode = rawInput.scrapingMode || 'enriched';
     const isBasicMode = scrapingMode === 'basic';

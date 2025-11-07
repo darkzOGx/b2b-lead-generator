@@ -135,10 +135,19 @@ Scrape Google Maps in **10 languages**:
 
 | Target Leads | Recommended Timeout | Apify Compute Units |
 |--------------|-------------------|-------------------|
-| 50 leads | 30 minutes (1,800s) | ~$0.50 |
-| 100 leads | 1 hour (3,600s) | ~$1.00 |
-| 500 leads | 4 hours (14,400s) | ~$5.00 |
-| 1,000 leads | 8 hours (28,800s) | ~$10.00 |
+| 50 leads | 30 minutes | ~$0.50 |
+| 100 leads | 1 hour | ~$1.00 |
+| 500 leads | 4 hours | ~$5.00 |
+| 1,000 leads | 8 hours | ~$10.00 |
+
+**💡 How to set timeout in Apify Console:**
+1. Click **"Run Options"** before starting the Actor
+2. Find **"Timeout"** field (in seconds)
+3. Enter timeout in **seconds**:
+   - **30 minutes** = `1800` seconds
+   - **1 hour** = `3600` seconds
+   - **4 hours** = `14400` seconds
+   - **8 hours** = `28800` seconds
 
 **Fast Mode** (basic data only) is **10x faster** at ~1,500 leads per hour.
 
