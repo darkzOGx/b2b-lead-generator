@@ -45,10 +45,11 @@ export const extractEmailFromWebsite = async (websiteUrl) => {
     ];
 
     const crawler = new CheerioCrawler({
-        maxRequestsPerCrawl: 1000, // High limit to avoid global counter issues
+        maxRequestsPerCrawl: maxPagesToVisit, // Limit pages to maxPagesToVisit
         maxConcurrency: 1,
-        maxRequestRetries: 2,
-        requestHandlerTimeoutSecs: 30,
+        maxRequestRetries: 1,
+        requestHandlerTimeoutSecs: 20, // Faster timeout per page
+        navigationTimeoutSecs: 15, // Faster navigation
         // Each email extraction gets its own queue
         requestQueue: await Actor.openRequestQueue(),
 
@@ -111,7 +112,12 @@ export const extractEmailFromWebsite = async (websiteUrl) => {
                         foundEmail = priorityEmail || cleanedEmails[0];
 
                         console.log(`📧 Found email: ${foundEmail} on ${request.url}`);
-                        return; // Stop crawling
+
+                        // Abort the crawler immediately to stop processing queued pages
+                        if (crawler.autoscaledPool) {
+                            await crawler.autoscaledPool.abort();
+                        }
+                        return;
                     }
                 }
 
