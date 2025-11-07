@@ -5,7 +5,7 @@
 ![Version](https://img.shields.io/badge/version-2.1-blue)
 ![Email Extraction](https://img.shields.io/badge/email_extraction-70%25-success)
 ![Lead Scoring](https://img.shields.io/badge/lead_scoring-AI_powered-purple)
-![Price](https://img.shields.io/badge/price-$0.03%2Flead-green)
+![Price](https://img.shields.io/badge/price-$0.20%2Flead-green)
 
 ---
 
@@ -27,7 +27,7 @@ This is the **ONLY** Google Maps scraper on Apify with **AI Lead Scoring (A+ to 
 | **Reviews Extraction** | 🟢 Optional (up to 100/place) | 🟢 Available |
 | **Multi-Language** | 🟢 10 languages | 🟡 Limited |
 | **Pricing Model** | 🟢 **All-in-one pricing** | 🟡 Basic data only |
-| **Price per 1,000 Leads** | 🟢 **$5** (basic) / **$30** (with emails) | 🟢 $4 (basic only) |
+| **Price per 1,000 Leads** | 🟢 **$20** (basic & enriched) | 🟢 $4 (basic only) |
 
 ### 💰 Pricing Breakdown Comparison
 
@@ -39,16 +39,16 @@ This is the **ONLY** Google Maps scraper on Apify with **AI Lead Scoring (A+ to 
 - $49/month plan: 15,000-20,000 basic results
 
 **This Actor:**
-- **Basic Mode:** $5 per 1,000 leads (10x faster, basic data)
-- **Full Mode with Emails:** $30 per 1,000 leads ✅
-  - 70% email extraction included
-  - AI lead scoring A+ to F
+- **Unified Pricing:** $20 per 1,000 leads ($0.20/lead) ✅
+  - Same price for Basic OR Enriched mode
+  - 70% email extraction included in all modes
+  - AI lead scoring A+ to F included
   - Website, phone, address, social links
   - All filters and enrichment included
 
 **The Difference:**
 - Competitor gives you **names and addresses** for $4
-- We give you **sales-ready leads with emails** for $30
+- We give you **sales-ready leads with emails** for $20
 - 70% email extraction = **actual contact ability**
 - AI scoring saves **10+ hours** of manual qualification
 
@@ -135,10 +135,10 @@ Scrape Google Maps in **10 languages**:
 
 | Target Leads | Recommended Timeout | Apify Compute Units |
 |--------------|-------------------|-------------------|
-| 50 leads | 30 minutes | ~$0.50 |
-| 100 leads | 1 hour | ~$1.00 |
-| 500 leads | 4 hours | ~$5.00 |
-| 1,000 leads | 8 hours | ~$10.00 |
+| 50 leads | 30 minutes | ~$10.00 |
+| 100 leads | 1 hour | ~$20.00 |
+| 500 leads | 4 hours | ~$100.00 |
+| 1,000 leads | 8 hours | ~$200.00 |
 
 **💡 How to set timeout:**
 Scroll down in the Input form to find **"⏱️ Timeout (Seconds)"** field.
@@ -224,14 +224,14 @@ Zazz,contact@zazz.io,5.0,30,85,A,Software company
 - 10x faster scraping speed
 - Basic data: name, rating, reviews, Google Maps URL
 - Perfect for building large lead lists quickly
-- **Cost: $5 per 1,000 leads** (similar to competitor's $4)
+- **Cost: $20 per 1,000 leads ($0.20/lead)**
 
 **🎯 Enriched (Slow) Mode:** (Recommended)
 - Full contact information extraction
 - Includes: website, phone, email, address, social links
 - AI-powered lead scoring (A+ to F grades)
 - Perfect for sales-ready leads
-- **Cost: $30 per 1,000 leads** (70% with verified emails)
+- **Cost: $20 per 1,000 leads ($0.20/lead)** - 70% with verified emails
 
 ### 1. Basic Configuration (Most Popular)
 
@@ -343,39 +343,38 @@ Zazz,contact@zazz.io,5.0,30,85,A,Software company
 
 ### Compute Unit Breakdown
 
-| Scraping Mode | Cost per Lead | 500 Leads | 1,000 Leads | 2,000 Leads |
-|---------------|--------------|-----------|-------------|-------------|
-| **Basic Mode** | $0.005 | $2.50 CU | $5 CU | $10 CU |
-| **Full Mode (no email)** | $0.02 | $10 CU | $20 CU | $40 CU |
-| **Full Mode + Emails** | $0.03 | $15 CU | $30 CU | $60 CU |
-| **Full + Emails + Reviews** | $0.05 | $25 CU | $50 CU | $100 CU |
+| Scraping Mode | Cost per Lead | 100 Leads | 500 Leads | 1,000 Leads |
+|---------------|--------------|-----------|-----------|-------------|
+| **Basic Mode** | $0.20 | $20 CU | $100 CU | $200 CU |
+| **Enriched Mode + Emails** | $0.20 | $20 CU | $100 CU | $200 CU |
+| **Enriched + Reviews** | $0.20 | $20 CU | $100 CU | $200 CU |
 
 ### Recommended Plans
 
 **Apify $49 Starter Plan Gets You:**
-- **With Basic Mode:** 10,000 basic leads (names, ratings, addresses)
-- **With Email Extraction:** 1,600 sales-ready leads with emails + AI scoring
-- **Free $5 Credit:** 165 leads with full email extraction
+- **245 enriched leads** with emails + AI scoring ($0.20/lead)
+- Same price for Basic or Enriched modes
+- **Free $5 Credit:** 25 leads with full email extraction
 
 **Compare to Competitor ($49 plan):**
 - **Competitor:** 15,000-20,000 basic names only
-- **This Actor:** 1,600 leads with emails + AI grades + qualification
+- **This Actor:** 245 leads with emails + AI grades + qualification
 
 ### ROI Comparison
 
 | Method | Cost for 1,000 Leads | Email Included | Quality Scoring | Delivery |
 |--------|---------------------|----------------|-----------------|----------|
 | **Competitor Scraper** | $4 | ❌ No | ❌ No | 30 min |
-| **This Actor (Basic)** | $5 | ❌ No | ❌ No | 15 min |
-| **This Actor (Full)** | $30 | ✅ 70% rate | ✅ A+ to F | 1-2 hours |
+| **This Actor (Basic)** | $20 | ✅ Optional | ✅ A+ to F | 15 min |
+| **This Actor (Enriched)** | $20 | ✅ 70% rate | ✅ A+ to F | 1-2 hours |
 | **Lead Vendors** | $500-$2,000 | ✅ Yes | ❌ No | 3-7 days |
 | **Manual Research** | $500+ (labor) | ✅ Yes | ⚠️ Manual | 20+ hours |
 
 ### Free Tier Benefits
 
 Apify provides **$5 free compute units monthly**:
-- Generate **250 leads in fast mode**
-- Generate **165 leads with full email extraction**
+- Generate **25 enriched leads** with email extraction ($0.20/lead)
+- Same pricing for Basic or Enriched modes
 - Perfect for testing before scaling up
 
 ---
@@ -514,15 +513,17 @@ Higher = faster but uses more compute units and may cause memory issues.
 
 ### Enrichment Options
 
-| Option | Type | Default | Cost Impact | Description |
-|--------|------|---------|-------------|-------------|
-| **extractEmails** | Boolean | true | +$0.01/lead | Visit websites to find contact emails |
-| **validateContacts** | Boolean | false | +$0.01/lead | Verify email deliverability (placeholder) |
-| **extractReviews** | Boolean | false | +$0.02/lead | Extract customer reviews for analysis |
-| **maxReviewsPerPlace** | Integer | 10 | Varies | Number of reviews to extract (1-100) |
-| **companyData** | Boolean | false | +$0.02/lead | Enrich with employee count, revenue (placeholder) |
-| **techStack** | Boolean | false | +$0.01/lead | Detect technologies used (placeholder) |
-| **findDecisionMakers** | Boolean | false | +$0.03/lead | Search LinkedIn for contacts (placeholder) |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| **extractEmails** | Boolean | true | Visit websites to find contact emails |
+| **validateContacts** | Boolean | false | Verify email deliverability (placeholder) |
+| **extractReviews** | Boolean | false | Extract customer reviews for analysis |
+| **maxReviewsPerPlace** | Integer | 10 | Number of reviews to extract (1-100) |
+| **companyData** | Boolean | false | Enrich with employee count, revenue (placeholder) |
+| **techStack** | Boolean | false | Detect technologies used (placeholder) |
+| **findDecisionMakers** | Boolean | false | Search LinkedIn for contacts (placeholder) |
+
+**Note:** All enrichment options included in the unified $0.20/lead pricing
 
 ### Filter Options
 
@@ -684,14 +685,14 @@ MIT License - Free to use and modify
 - ✅ 70% email extraction (industry-leading)
 - ✅ AI-powered A+ to F lead scoring (only on Apify)
 - ✅ Clean, validated data (no junk)
-- ✅ 40% cheaper than competitors
+- ✅ Unified pricing - no hidden costs
 - ✅ 10 languages supported
 - ✅ Production-tested reliability
 
 ### Pricing:
-- **Free tier:** 165 leads with $5 Apify credit
-- **Recommended:** $59/month for 2,000 leads
-- **Cost per lead:** $0.03 (vs $0.50-$2.00 from lead vendors)
+- **Free tier:** 25 leads with $5 Apify credit
+- **Unified pricing:** $20 per 1,000 leads ($0.20/lead)
+- **Cost per lead:** $0.20 (vs $0.50-$2.00 from lead vendors)
 
 ### Next Steps:
 1. Click **Start** to launch the actor
